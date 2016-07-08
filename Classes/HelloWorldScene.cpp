@@ -2,6 +2,7 @@
 #include "SimpleAudioEngine.h"
 #include"ui/CocosGUI.h"
 #include <iostream>
+#include<math.h>
 USING_NS_CC;
 //using namespace std;
 
@@ -31,6 +32,7 @@ bool HelloWorld::init()
         return false;
     }
 	speed = 1;
+	move = false;
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -91,38 +93,76 @@ bool HelloWorld::init()
 		}
 	});
 	this->addChild(button);*/
-	start = Sprite::create("start.png");
-	start->setPosition(100, 100);
-	this->addChild(start);
-	dian = Sprite::create("dian1.png");
-	dian->setPosition(300, 200);
-	this->addChild(dian);
-	move = false;
+	//start = Sprite::create("start.png");
+	//start->setPosition(100, 100);
+	//this->addChild(start);
+	//dian = Sprite::create("dian1.png");
+	//dian->setPosition(300, 200);
+	//this->addChild(dian);
+	//move = false;
+	//auto listener = EventListenerTouchOneByOne::create();
+	//listener->setSwallowTouches(true);
+	//listener->onTouchBegan = [=](Touch*touch, Event*event){
+	//	auto p1 = touch->getLocation();
+	//	auto p2 = start->getPosition();
+	//	auto length =  ccpDistance(p1, p2);
+	//	if (length < 60)
+	//	{
+	//		log("onTouch");
+	//		//dian ->runAction(RepeatForever::create(Sequence::create(MoveTo::create(1.0f, Point(300, 0)), MoveTo::create(1.0f, Point(300, visibleSize.height)), NULL)));
+	//		//schedule(schedule_selector(HelloWorld::updateCustom), 2.0f, kRepeatForever, 0);
+	//		_start();
+	//	}
+	//	
+	//	//auto target = static_cast<Sprite*>(event->getCurrentTarget());
+	//
+	//	return true;
+	//};
+	//listener->onTouchEnded = [=](Touch*touch, Event*event)
+	//{
+	//	log("end");
+	//	_stop();
+	//	//this->unschedule(schedule_selector(HelloWorld::updateCustom));
+	//};
+	////schedule(schedule_selector(HelloWorld::updateCustom), 1.0f, kRepeatForever, 0);
+	//Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+	zou = Sprite::create("zou.png");
+	zou->setPosition(300, 50);
+	this->addChild(zou);
+	you = Sprite::create("you.png");
+	you->setPosition(200, 50);
+	this->addChild(you);
+	hen = Sprite::create("hen.png");
+	hen->setPosition(100, 100);
+	hen->setScale(0.2f);
+	this->addChild(hen);
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
-	listener->onTouchBegan = [=](Touch*touch, Event*event){
+	listener->onTouchBegan = [=](Touch*touch, Event*event)
+	{
 		auto p1 = touch->getLocation();
-		auto p2 = start->getPosition();
-		auto length =  ccpDistance(p1, p2);
-		if (length < 60)
+		auto p2 = zou->getPosition();
+		auto p3 = you->getPosition();
+		auto rect1 = Rect(p2.x - 35, p2.y - 10, 70, 20);
+		auto rect2 = Rect(p3.x - 35, p3.y - 10, 70, 20);
+		if (rect1.containsPoint(p1))
 		{
-			log("onTouch");
-			//dian ->runAction(RepeatForever::create(Sequence::create(MoveTo::create(1.0f, Point(300, 0)), MoveTo::create(1.0f, Point(300, visibleSize.height)), NULL)));
-			//schedule(schedule_selector(HelloWorld::updateCustom), 2.0f, kRepeatForever, 0);
+			log("you");
 			_start();
 		}
+		if (rect2.containsPoint(p1))
+		{
+			log("zou");
 		
-		//auto target = static_cast<Sprite*>(event->getCurrentTarget());
-	
+			_start1();
+		}
 		return true;
 	};
 	listener->onTouchEnded = [=](Touch*touch, Event*event)
 	{
 		log("end");
 		_stop();
-		//this->unschedule(schedule_selector(HelloWorld::updateCustom));
 	};
-	//schedule(schedule_selector(HelloWorld::updateCustom), 1.0f, kRepeatForever, 0);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
     return true;
 }
@@ -132,15 +172,28 @@ bool HelloWorld::init()
 void HelloWorld::updateCustom(float dt)
 {
 	
-	
-	auto p_cur = dian->getPosition();
-	auto p_add = Vec2(0,speed);
-	dian->setPosition(p_cur.x, p_cur.y + speed);
-	if ((300 - p_cur.y) == 0)
+	auto p_cur = hen->getPosition();
+	auto p_add = Vec2(0,speed);	
+	hen->setPosition(p_cur.x + speed, p_cur.y);
+	if (p_cur.x >=420)
 	{
-		speed = -1;
+		speed = 0;
 	}
-	if (p_cur.y ==0)
+	else
+	{
+		speed = 1;
+	}
+}
+void HelloWorld::updateCustom1(float dt)
+{
+	auto p_cur = hen->getPosition();
+	auto p_add = Vec2(0, speed);
+	hen->setPosition(p_cur.x - speed, p_cur.y);
+	if (p_cur.x <= 50)
+	{
+		speed = 0;
+	}
+	else
 	{
 		speed = 1;
 	}
@@ -150,6 +203,16 @@ void  HelloWorld::_start()
 	if (!move)
 	{
 		schedule(schedule_selector(HelloWorld::updateCustom),0.01f,  kRepeatForever, 0);
+		
+		move = true;
+	}
+	
+}
+void HelloWorld::_start1()
+{
+	if (!move)
+	{
+		schedule(schedule_selector(HelloWorld::updateCustom1), 0.01f, kRepeatForever, 0);
 
 		move = true;
 	}
@@ -158,7 +221,8 @@ void  HelloWorld::_stop()
 {
 	if (move)
 	{
-		this->unschedule(schedule_selector(HelloWorld::updateCustom));
+		//this->unschedule(schedule_selector(HelloWorld::updateCustom));
+		this->unscheduleAllSelectors();
 		move = false;
 	}
 	

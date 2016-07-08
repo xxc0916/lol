@@ -20,9 +20,14 @@ public:
 	Sprite* pause;
 	Sprite* stop;
 	Sprite*dian;
+	Sprite*zou;
+	Sprite*you;
+	Sprite*hen;
 	void updateCustom(float dt);
+	void updateCustom1(float dt);
 	bool move;
 	void _start();
+	void _start1();
 	void _stop();
 	int i;
 	int speed;
