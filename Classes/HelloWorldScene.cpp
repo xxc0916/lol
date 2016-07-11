@@ -32,8 +32,9 @@ bool HelloWorld::init()
         return false;
     }
 	speed = 1;
+	
 	move = false;
-    auto visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     ///////////////////////////////
@@ -128,14 +129,22 @@ bool HelloWorld::init()
 	//Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 	zou = Sprite::create("zou.png");
 	zou->setPosition(300, 50);
-	this->addChild(zou);
+	this->addChild(zou,1);
 	you = Sprite::create("you.png");
 	you->setPosition(200, 50);
-	this->addChild(you);
+	this->addChild(you,1);
 	hen = Sprite::create("hen.png");
 	hen->setPosition(100, 100);
-	hen->setScale(0.2f);
-	this->addChild(hen);
+	hen->setScale(0.1f,0.2f);
+	this->addChild(hen,1);
+	b = hen->getContentSize();
+	b.width = b.width * 0.1f;
+	b.height = b.height * 0.2f;
+	auto di = Sprite::create("di_2.jpg");
+	di->setPosition(visibleSize.width /2, 45);
+	this->addChild(di, 0);
+	a = di->getContentSize();
+	di->setScaleX(visibleSize.width/a.width);
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
 	listener->onTouchBegan = [=](Touch*touch, Event*event)
@@ -149,21 +158,40 @@ bool HelloWorld::init()
 		{
 			log("you");
 			_start();
+			
 		}
 		if (rect2.containsPoint(p1))
 		{
 			log("zou");
 		
 			_start1();
+			
 		}
 		return true;
 	};
 	listener->onTouchEnded = [=](Touch*touch, Event*event)
 	{
-		log("end");
-		_stop();
+		auto p1 = touch->getLocation();
+		auto p2 = zou->getPosition();
+		auto p3 = you->getPosition();
+		auto rect1 = Rect(p2.x - 35, p2.y - 10, 70, 20);
+		auto rect2 = Rect(p3.x - 35, p3.y - 10, 70, 20);
+		if (rect1.containsPoint(p1))
+		{
+			log("youend");
+			hen->runAction(EaseIn::create(MoveBy::create(0.7f, Point(50, 0)),1));
+		}
+		if (rect2.containsPoint(p1))
+		{
+			log("zouend");
+			hen->runAction(EaseIn::create(MoveBy::create(0.7f, Point(-50, 0)),1));
+			
+		}
+		
+		 _stop();
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+	
     return true;
 }
 
@@ -174,29 +202,41 @@ void HelloWorld::updateCustom(float dt)
 	
 	auto p_cur = hen->getPosition();
 	auto p_add = Vec2(0,speed);	
-	hen->setPosition(p_cur.x + speed, p_cur.y);
-	if (p_cur.x >=420)
+	speed = 1;
+	if (p_cur.x >=visibleSize.width - b.width)
 	{
-		speed = 0;
+		//speed = 0;
+		hen->setPosition(0, p_cur.y);
+		//move = false;
 	}
 	else
 	{
-		speed = 1;
+		//speed = 1;
+		hen->setPosition(p_cur.x + speed, p_cur.y);
+		//speed = speed + 1;
+		//move = true;
 	}
+	//speed = speed + 1;
 }
 void HelloWorld::updateCustom1(float dt)
 {
 	auto p_cur = hen->getPosition();
 	auto p_add = Vec2(0, speed);
-	hen->setPosition(p_cur.x - speed, p_cur.y);
-	if (p_cur.x <= 50)
+	speed = 1;
+	if (p_cur.x <= b.width)
 	{
-		speed = 0;
+		//speed = 0;
+		hen->setPosition(visibleSize.width , p_cur.y);
+		//move = false;
 	}
 	else
 	{
-		speed = 1;
+		//speed = 1;
+		hen->setPosition(p_cur.x - speed, p_cur.y);
+		//speed = speed + 1;
+		//move = true;
 	}
+	//speed = speed + 1;
 }
 void  HelloWorld::_start()
 {

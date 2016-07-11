@@ -31,6 +31,9 @@ public:
 	void _stop();
 	int i;
 	int speed;
+	Size visibleSize;
+	Size a;
+	Size b;
 	//ui::Button* button;
 };
 
